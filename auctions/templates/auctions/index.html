@@ -3,5 +3,11 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    {% for Product in Products %}
+        <h4>{{ Product.name }}</h4>
+        <h5>Price: ${{Product.price}}</h5>
+        <h6>{{Product.description}}</h6>
+    {% endfor %}
+
+
 {% endblock %}
