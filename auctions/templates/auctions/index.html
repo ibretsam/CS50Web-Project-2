@@ -4,11 +4,14 @@
     <h2>Active Listings</h2>
 
     {% for Product in Products %}
-        <img src="{{Product.image}}" alt="" style="width: 500px;">
-        <h4>{{ Product.name }}</h4>
+        <img src="{{Product.image}}" style="max-width: 500px; max-height: 300px">
+        <a href="{% url 'auctions:listings' Product.id %}">
+            <h4>{{ Product.name }}</h4>
+        </a>
         <h5>Price: ${{Product.price}}</h5>
         <h6>{{Product.description}}</h6>
-        <p>{{Product.created_at}}</p>
+        <p>Created {{Product.created_at}}</p>
+        <hr>
     {% endfor %}
 
 

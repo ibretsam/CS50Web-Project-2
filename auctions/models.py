@@ -12,7 +12,7 @@ class User(AbstractUser):
 class Product(models.Model):
     name = models.CharField(max_length=256)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    description = models.TextField(default='')
+    description = models.TextField(default='', blank=True)
     image = models.ImageField(upload_to='auctions/media')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

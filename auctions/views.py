@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -67,3 +67,11 @@ def register(request):
 
 def create(request):
     return render(request, "auctions/create.html")    
+
+
+def listings(request, product_id):
+    listings = Product.objects.get(pk=product_id)
+    if listings is not None:
+        return render(request,'auctions/listings.html', {'listings': listings})
+    else:
+        raise Http404('Product does not exist')
