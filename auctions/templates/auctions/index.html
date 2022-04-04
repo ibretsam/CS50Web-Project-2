@@ -4,9 +4,11 @@
     <h2>Active Listings</h2>
 
     {% for Product in Products %}
+        <img src="{{Product.image}}" alt="" style="width: 500px;">
         <h4>{{ Product.name }}</h4>
         <h5>Price: ${{Product.price}}</h5>
         <h6>{{Product.description}}</h6>
+        <p>{{Product.created_at}}</p>
     {% endfor %}
 
 
