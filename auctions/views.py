@@ -1,10 +1,15 @@
+from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
-from .models import User, Product
+from .models import User, Product, Bid
+
+class newBidForm(forms.Form):
+    input = forms.FloatField()
 
 
 def index(request):
@@ -72,6 +77,19 @@ def create(request):
 def listings(request, product_id):
     listings = Product.objects.get(pk=product_id)
     if listings is not None:
-        return render(request,'auctions/listings.html', {'listings': listings})
+        return render(request,'auctions/listings.html', {
+            'listings': listings,
+            'bidding_history': listings.ProductBid.all(),
+            })
     else:
         raise Http404('Product does not exist')
+    
+@login_required    
+def bidding(request, product_id):
+    if request.method == "POST":
+        newBid = Bid.objects.create(
+        product = Product.objects.get(pk=product_id),
+        user = request.user,
+        bid = request.POST['bidding'])
+        
+    return HttpResponseRedirect(reverse('auctions:listings', args=(newBid.product.id,)))

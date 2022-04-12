@@ -4,10 +4,10 @@
     <h2>Active Listings</h2>
 
     {% for Product in Products %}
-        <img src="{{Product.image}}" style="max-width: 500px; max-height: 300px">
         <a href="{% url 'auctions:listings' Product.id %}">
+            <img src="{{Product.image}}" style="max-width: 500px; max-height: 300px">
             <h4>{{ Product.name }}</h4>
-        </a>
+        </a>    
         <h5>Price: ${{Product.price}}</h5>
         <h6>{{Product.description}}</h6>
         <p>Created {{Product.created_at}}</p>

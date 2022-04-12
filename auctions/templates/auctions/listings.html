@@ -5,4 +5,14 @@
     <img src="{{listings.image.url}}" style="max-width: 1000px; max-height: 500px">
     <p>{{listings.description}}</p>
     <h4>${{listings.price}}</h4>
+    <p>
+        {{ bidding_history.count }} bid(s) so far. Your bid is the current bid.
+    </p>
+    <form action="{% url 'auctions:bidding' listings.id %}" method="POST">
+        {% csrf_token %}
+        <input type="number" name="bidding">
+        <input type="submit" value="Place Bid">
+    </form>
+
+    
 {% endblock %}
