@@ -2,5 +2,17 @@
 {% block title %} Create Listing {% endblock %}
 
 {% block body %}
-
+<h4>Create new listing</h4>
+<form action="{% url 'auctions:create' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="name"> <br>
+    <label for="price" class="form-label">Price</label>
+    <input type="number" class="form-control" id="price" name="price"> <br>
+    <label for="description" class="form-label">Description</label>
+    <textarea id="description" cols="5" rows="5" class="form-control" name="description"></textarea> <br>
+    <label for="image" class="form-label">Image</label>
+    <input type="file" id="image" class="form-control" name="image"> <br>
+    <input type="submit" value="Save Listing" class="btn btn-primary">
+</form>
 {% endblock %}

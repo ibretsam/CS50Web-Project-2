@@ -1,3 +1,5 @@
+from email.mime import image
+from unicodedata import name
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
@@ -7,7 +9,6 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from .models import User, Product, Bid
-
 
 def index(request):
     return render(request, "auctions/index.html", {
@@ -66,8 +67,20 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
     
-
+@login_required
 def create(request):
+    if request.method == "POST":
+        Product_name = request.POST["name"]
+        Product_price = request.POST["price"]
+        Product_description = request.POST["description"]
+        Product_image = request.FILES["image"]
+        newProduct = Product.objects.create(
+            name = Product_name,
+            price = Product_price,
+            description = Product_description,
+            image = Product_image
+        )
+        return HttpResponseRedirect(reverse("auctions:listings", args=(newProduct.id,)))
     return render(request, "auctions/create.html")    
 
 
@@ -98,4 +111,4 @@ def bidding(request, product_id):
                 return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the highest bid"})
         else:
             return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the starting bid"})
-    
+        
