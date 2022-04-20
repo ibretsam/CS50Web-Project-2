@@ -86,10 +86,12 @@ def create(request):
 
 def listings(request, product_id):
     listings = Product.objects.get(pk=product_id)
+    maxBidPrice = float(max(listings.product_bids.values_list("bid", flat=True)))
     if listings is not None:
         return render(request,'auctions/listings.html', {
             'listings': listings,
-            'bidding_history': listings.ProductBid.all(),
+            'bidding_history': listings.product_bids.all(),
+            'maxBidPrice': maxBidPrice
             })
     else:
         raise Http404('Product does not exist')
@@ -100,15 +102,24 @@ def bidding(request, product_id):
         listings = Product.objects.get(pk=product_id)
         newInput = float(request.POST['bidding'])
         if newInput > listings.price:
-            maxBidPrice = float(max(Bid.objects.values_list("bid", flat=True)))
+            BidPriceList = listings.product_bids.values_list("bid", flat=True)
+            if not BidPriceList:
+                maxBidPrice = listings.price
+            else:
+                maxBidPrice = float(max(BidPriceList))
             if newInput > maxBidPrice:
                 newBid = Bid.objects.create(
                     product = Product.objects.get(pk=product_id),
                     user = request.user,
                     bid = request.POST['bidding'])
-                return HttpResponseRedirect(reverse('auctions:listings', args=(newBid.product.id,)))
+                return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': newBid.product.id,} ))
             else:
                 return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the highest bid"})
         else:
             return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the starting bid"})
         
+@login_required
+def close(request, product_id):
+    if request.user.is_authenticated:
+        
+        return HttpResponseRedirect(reverse('auctions:listings', args=(product_id,)))

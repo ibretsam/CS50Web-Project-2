@@ -4,7 +4,8 @@
     <h4>Listing: {{listings.name}}</h4>
     <img src="{{listings.image.url}}" style="max-width: 1000px; max-height: 500px">
     <p>{{listings.description}}</p>
-    <h4>${{listings.price}}</h4>
+    <h4>Starting Bid: ${{listings.price}}</h4>
+    <h4>Current Bid: ${{maxBidPrice}}</h4>
     <p>
         {{ bidding_history.count }} bid(s) so far. Your bid is the current bid.
     </p>
