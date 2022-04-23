@@ -78,7 +78,8 @@ def create(request):
             name = Product_name,
             price = Product_price,
             description = Product_description,
-            image = Product_image
+            image = Product_image,
+            close = False
         )
         return HttpResponseRedirect(reverse("auctions:listings", args=(newProduct.id,)))
     return render(request, "auctions/create.html")    
@@ -86,12 +87,22 @@ def create(request):
 
 def listings(request, product_id):
     listings = Product.objects.get(pk=product_id)
-    maxBidPrice = float(max(listings.product_bids.values_list("bid", flat=True)))
+    BidList = listings.product_bids.values_list("bid", flat=True)
+    BidderList = list(listings.product_bids.values_list("user_id", flat=True))
+    if not BidderList:
+        winner = "No one has bid on this listing"
+    else:
+        winner = User.objects.get(pk = BidderList[-1])
+    if not BidList:
+        maxBidPrice = listings.price
+    else:
+        maxBidPrice = float(max(BidList))
     if listings is not None:
         return render(request,'auctions/listings.html', {
             'listings': listings,
             'bidding_history': listings.product_bids.all(),
-            'maxBidPrice': maxBidPrice
+            'maxBidPrice': format(maxBidPrice,".2f"),
+            'winner': winner
             })
     else:
         raise Http404('Product does not exist')
@@ -114,12 +125,15 @@ def bidding(request, product_id):
                     bid = request.POST['bidding'])
                 return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': newBid.product.id,} ))
             else:
-                return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the highest bid"})
+                return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the current bid"})
         else:
             return render(request, "auctions/error.html", {'error_message': "Your bid must greater than the starting bid"})
         
 @login_required
 def close(request, product_id):
-    if request.user.is_authenticated:
-        
-        return HttpResponseRedirect(reverse('auctions:listings', args=(product_id,)))
+    if request.method == "POST":
+        listings = Product.objects.get(pk = product_id)
+        if request.user == listings.created_by:
+            listings.close = True
+            listings.save()
+            return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listings.id}))

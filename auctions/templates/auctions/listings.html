@@ -4,15 +4,32 @@
     <h4>Listing: {{listings.name}}</h4>
     <img src="{{listings.image.url}}" style="max-width: 1000px; max-height: 500px">
     <p>{{listings.description}}</p>
+    <p>Listed by {{ listings.created_by }}</p>
     <h4>Starting Bid: ${{listings.price}}</h4>
     <h4>Current Bid: ${{maxBidPrice}}</h4>
-    <p>
-        {{ bidding_history.count }} bid(s) so far. Your bid is the current bid.
-    </p>
-    <form action="{% url 'auctions:bidding' listings.id %}" method="POST">
-        {% csrf_token %}
-        <input type="number" name="bidding">
-        <input type="submit" value="Place Bid">
-    </form>
+    {% if listings.close == False %}
+        <p>
+            {{ bidding_history.count }} bid(s) so far. Your bid is the current bid.
+        </p>
+        <form action="{% url 'auctions:bidding' listings.id %}" method="POST">
+            {% csrf_token %}
+            <input type="number" name="bidding">
+            <input type="submit" value="Place Bid">
+        </form>
+        {% if request.user == listings.created_by %}
+        <form action="{% url 'auctions:close' listings.id %}" method="POST">
+            {% csrf_token %}
+            <input style="margin-top: 10px;" type="submit" value="Close listing" class="btn btn-primary">
+        </form>
+    {% endif %}
+    {% else %}
+        
+        <p>This listing is closed</p>
+        {% if request.user == winner %}
+            <p>You've won this listing</p>
+        {% endif %}
+    {% endif %}
+    
+
 
 {% endblock %}
