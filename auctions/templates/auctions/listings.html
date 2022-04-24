@@ -11,15 +11,16 @@
         <p>
             {{ bidding_history.count }} bid(s) so far. Your bid is the current bid.
         </p>
-        <form action="{% url 'auctions:bidding' listings.id %}" method="POST">
+        <form action="{% url 'auctions:bidding' listings.id %}" method="POST" style="display: flex;">
             {% csrf_token %}
-            <input type="number" name="bidding">
-            <input type="submit" value="Place Bid">
+            <input style="width: 200px; margin-right: 20px" type="number" class="form-control" name="bidding" placeholder="Place your bid here">
+            <br>
+            <input type="submit" value="Place Bid" class="btn btn-primary">
         </form>
         {% if request.user == listings.created_by %}
         <form action="{% url 'auctions:close' listings.id %}" method="POST">
             {% csrf_token %}
-            <input style="margin-top: 10px;" type="submit" value="Close listing" class="btn btn-primary">
+            <input style="margin-top: 10px;" type="submit" value="Close listing" class="btn btn-danger">
         </form>
     {% endif %}
     {% else %}
@@ -32,13 +33,13 @@
     <br>
     <form action="{% url 'auctions:comment' listings.id %}" method="POST">
         {% csrf_token %}
-        <textarea name="comment" cols="200" rows="5" placeholder="Type your comment here"></textarea>
+        <textarea name="comment" class="form-control" cols="200" rows="5" placeholder="Type your comment here"></textarea>
         <br>
-        <input type="submit" value="Comment">
+        <input type="submit" value="Comment" class="btn btn-primary">
     </form>
 
     <br>
     {% for comment in commentList %}
-        {{ comment }} <br> {{ comment.date }}<br>
+        {{ comment }} <br> {{ comment.date }}<br> <br>
     {% endfor %}
 {% endblock %}
