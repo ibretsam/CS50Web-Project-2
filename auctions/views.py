@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Product, Bid
+from .models import User, Product, Bid, Comment
 
 def index(request):
     return render(request, "auctions/index.html", {
@@ -89,6 +89,7 @@ def listings(request, product_id):
     listings = Product.objects.get(pk=product_id)
     BidList = listings.product_bids.values_list("bid", flat=True)
     BidderList = list(listings.product_bids.values_list("user_id", flat=True))
+    CommentList = listings.product_comment.all()
     if not BidderList:
         winner = "No one has bid on this listing"
     else:
@@ -102,7 +103,8 @@ def listings(request, product_id):
             'listings': listings,
             'bidding_history': listings.product_bids.all(),
             'maxBidPrice': format(maxBidPrice,".2f"),
-            'winner': winner
+            'winner': winner,
+            'commentList': CommentList
             })
     else:
         raise Http404('Product does not exist')
@@ -137,3 +139,16 @@ def close(request, product_id):
             listings.close = True
             listings.save()
             return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listings.id}))
+        
+@login_required
+def comment(request, product_id):
+    if request.method == "POST":
+        listing = Product.objects.get(pk = product_id)
+        user_comment = request.user
+        content = request.POST["comment"]
+        newComment = Comment.objects.create(
+            user = user_comment,
+            product = listing,
+            comment = content
+        )
+        return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listing.id}))

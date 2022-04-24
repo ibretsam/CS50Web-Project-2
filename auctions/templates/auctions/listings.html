@@ -23,13 +23,22 @@
         </form>
     {% endif %}
     {% else %}
-        
         <p>This listing is closed</p>
         {% if request.user == winner %}
             <p>You've won this listing</p>
         {% endif %}
     {% endif %}
-    
+    <br>
+    <br>
+    <form action="{% url 'auctions:comment' listings.id %}" method="POST">
+        {% csrf_token %}
+        <textarea name="comment" cols="200" rows="5" placeholder="Type your comment here"></textarea>
+        <br>
+        <input type="submit" value="Comment">
+    </form>
 
-
+    <br>
+    {% for comment in commentList %}
+        {{ comment }} <br> {{ comment.date }}<br>
+    {% endfor %}
 {% endblock %}
