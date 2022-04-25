@@ -18,6 +18,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     close = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_created", default=1)
+    in_watchlist = models.ManyToManyField(User, blank=True ,related_name="watchlist")
     
     def __str__(self):
         return f"{self.name}"
@@ -38,3 +39,4 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"{self.user}: {self.comment}"
+    

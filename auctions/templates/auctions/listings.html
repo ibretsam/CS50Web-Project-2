@@ -5,6 +5,11 @@
     <img src="{{listings.image.url}}" style="max-width: 1000px; max-height: 500px">
     <p>{{listings.description}}</p>
     <p>Listed by {{ listings.created_by }}</p>
+    {% if listings in Watchlist %}
+        <a href="{% url 'auctions:watchlist' listings.id %}">Remove from watchlist</a>
+    {% else %}
+        <a href="{% url 'auctions:watchlist' listings.id %}">Add to watchlist</a>
+    {% endif %}
     <h4>Starting Bid: ${{listings.price}}</h4>
     <h4>Current Bid: ${{maxBidPrice}}</h4>
     {% if listings.close == False %}
@@ -42,4 +47,6 @@
     {% for comment in commentList %}
         {{ comment }} <br> {{ comment.date }}<br> <br>
     {% endfor %}
+
+
 {% endblock %}

@@ -1,6 +1,3 @@
-from email.mime import image
-from unicodedata import name
-from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -104,7 +101,8 @@ def listings(request, product_id):
             'bidding_history': listings.product_bids.all(),
             'maxBidPrice': format(maxBidPrice,".2f"),
             'winner': winner,
-            'commentList': CommentList
+            'commentList': CommentList,
+            "Watchlist": request.user.watchlist.all()
             })
     else:
         raise Http404('Product does not exist')
@@ -152,3 +150,19 @@ def comment(request, product_id):
             comment = content
         )
         return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listing.id}))
+    
+@login_required
+def watchlist(request, product_id):
+    listings = Product.objects.get(pk = product_id)
+    watchlist = request.user.watchlist.all()
+    if listings in watchlist:
+        listings.in_watchlist.remove(request.user)
+    else:
+        listings.in_watchlist.add(request.user)
+    return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listings.id}))
+
+@login_required
+def showWatchList(request):
+    return render (request, "auctions/watchlist.html", {
+        "Watchlist": request.user.watchlist.all()
+    })
