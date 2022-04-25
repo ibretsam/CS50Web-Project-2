@@ -88,6 +88,7 @@ def listings(request, product_id):
     BidderList = list(listings.product_bids.values_list("user_id", flat=True))
     CommentList = listings.product_comment.all()
     
+    # Check if user is signed in or not, if not, the watchlist feature won't be showed
     if request.user.is_authenticated:
         watchlist = request.user.watchlist.all()
     else:

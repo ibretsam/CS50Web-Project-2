@@ -3,7 +3,7 @@
 {% block body %}
 <h2>Watchlist</h2>
 
-
+{% if Watchlist %}
     {% for listing in Watchlist %}
         <a href="{% url 'auctions:listings' listing.id %}">
             <img src="{{listing.image}}" style="max-width: 500px; max-height: 300px">
@@ -14,6 +14,8 @@
         <p>Created {{listing.created_at}}</p>
         <hr>
     {% endfor %}
-    
+{% else %}
+        <p>No listing added to watchlist</p>
+{% endif %}
 
 {% endblock %}
