@@ -87,14 +87,25 @@ def listings(request, product_id):
     BidList = listings.product_bids.values_list("bid", flat=True)
     BidderList = list(listings.product_bids.values_list("user_id", flat=True))
     CommentList = listings.product_comment.all()
+    
+    if request.user.is_authenticated:
+        watchlist = request.user.watchlist.all()
+    else:
+        watchlist = None
+    
+    # Check if anyone bid on this listing, if yes, the last bidder will be the winner
     if not BidderList:
         winner = "No one has bid on this listing"
     else:
         winner = User.objects.get(pk = BidderList[-1])
+        
+    # Check if anyone bid on this listing, if no, the current bid is the starting bid, else, the current bid will be the max value of the bid list
     if not BidList:
         maxBidPrice = listings.price
     else:
         maxBidPrice = float(max(BidList))
+    
+    # Return the listing info to the template 
     if listings is not None:
         return render(request,'auctions/listings.html', {
             'listings': listings,
@@ -102,7 +113,7 @@ def listings(request, product_id):
             'maxBidPrice': format(maxBidPrice,".2f"),
             'winner': winner,
             'commentList': CommentList,
-            "Watchlist": request.user.watchlist.all()
+            "Watchlist": watchlist
             })
     else:
         raise Http404('Product does not exist')
