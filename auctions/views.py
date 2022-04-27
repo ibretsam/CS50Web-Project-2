@@ -138,17 +138,19 @@ def bidding(request, product_id):
         listings = Product.objects.get(pk=product_id)
         newInput = float(request.POST['bidding'])
         
-        # Check if the user input is valid (must be greater than the starting bid), then create a BidPriceList which contains all of the Bid history
+        # Check if the user input is valid (must be greater than the starting bid), if not, return an error message
         if newInput > listings.price:
+            
+            #Create a BidPriceList list to store all the bidding history
             BidPriceList = listings.product_bids.values_list("bid", flat=True)
             
-            # Check if the BidPriceList is empty, then the maxBidPrice is the starting bid, if not, the maxBidPrice is the max value in the BidPriceList
+            # Check if the BidPriceList is empty, if yes, the maxBidPrice is the starting bid, if not, the maxBidPrice is the max value in the BidPriceList
             if not BidPriceList:
                 maxBidPrice = listings.price
             else:
                 maxBidPrice = float(max(BidPriceList))
                 
-            # Check if the user input is valid (must be greater than the maxBid)
+            # Check if the user input is valid (must be greater than the maxBid), if valid, create a new bid
             if newInput > maxBidPrice:
                 newBid = Bid.objects.create(
                     product = Product.objects.get(pk=product_id),
