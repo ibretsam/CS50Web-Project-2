@@ -183,7 +183,8 @@ def comment(request, product_id):
             comment = content
         )
         return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listing.id}))
-    
+
+# This function is for adding listing to watchlist    
 @login_required
 def watchlist(request, product_id):
     listings = Product.objects.get(pk = product_id)
@@ -194,6 +195,7 @@ def watchlist(request, product_id):
         listings.in_watchlist.add(request.user)
     return HttpResponseRedirect(reverse('auctions:listings', kwargs={'product_id': listings.id}))
 
+# This function is for showing the watchlist
 @login_required
 def showWatchList(request):
     return render (request, "auctions/watchlist.html", {
