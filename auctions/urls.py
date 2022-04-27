@@ -18,7 +18,10 @@ urlpatterns = [
     path("listings/<int:product_id>/close", views.close, name="close"),
     path("listings/<int:product_id>/comment", views.comment, name="comment"),
     path("listings/<int:product_id>/watchlist", views.watchlist, name="watchlist"),
-    path("watchlist", views.showWatchList, name="showWatchlist")
+    path("watchlist", views.showWatchList, name="showWatchlist"),
+    path("categories", views.showCategories, name="categories"),
+    path("categories/<int:categories_id>", views.Categories, name="category")
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)

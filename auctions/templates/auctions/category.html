@@ -1,15 +1,17 @@
 {% extends "auctions/layout.html" %}
 {% block title %}
-    Watchlist
+    Category: {{category.name}}
 {% endblock %}
 
 {% block body %}
-<h2>Watchlist</h2>
+<h2>Category: {{ category }}</h2>
 
-{% if Watchlist %}
-    {% for listing in Watchlist %}
+{% if not category_listing %}
+    <p>There're no listing in this category</p>
+{% else %}
+    {% for listing in category_listing %}
         <a href="{% url 'auctions:listings' listing.id %}">
-            <img src="{{listing.image}}" style="max-width: 500px; max-height: 300px">
+            <img src="{{ listing.image.url }}" style="max-width: 500px; max-height: 300px">
             <h4>{{ listing.name }}</h4>
         </a>    
         <h5>Price: ${{listing.price}}</h5>
@@ -17,8 +19,5 @@
         <p>Created {{listing.created_at}}</p>
         <hr>
     {% endfor %}
-{% else %}
-        <p>No listing added to watchlist</p>
 {% endif %}
-
 {% endblock %}

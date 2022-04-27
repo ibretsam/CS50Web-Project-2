@@ -1,3 +1,32 @@
 body {
     padding: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.product-info{
+    display: flex;
+}
+.product-info .right-col{
+    margin-left: 100px;
+}
+.product-info .description{
+    margin-top: 20px;
+}
+.product-info .watchlist{
+    width: inherit;
+}
+.product-info .watchlist a{
+    width: 100%;
+}
+
+.product-info .close-form{
+    width: inherit;
+}
+
+.product-info .close-form input{
+    width: 100%;
+}
+
+.detail{
+    margin-top: 20px;
 }

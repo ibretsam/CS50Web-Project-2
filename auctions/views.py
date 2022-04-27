@@ -1,3 +1,4 @@
+from unicodedata import category
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -5,11 +6,16 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, Product, Bid, Comment
+from .models import Category, User, Product, Bid, Comment
 
 def index(request):
+    if request.user.is_authenticated:
+        Watchlist = request.user.watchlist.all()
+    else:
+        Watchlist = None
     return render(request, "auctions/index.html", {
-        "Products": Product.objects.all()
+        "Products": Product.objects.all(),
+        "Watchlist": Watchlist
     })
 
 
@@ -36,7 +42,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("auctions:index"))
-
 
 def register(request):
     if request.method == "POST":
@@ -66,20 +71,26 @@ def register(request):
     
 @login_required
 def create(request):
+    CategoryList = Category.objects.all()
     if request.method == "POST":
         Product_name = request.POST["name"]
         Product_price = request.POST["price"]
         Product_description = request.POST["description"]
         Product_image = request.FILES["image"]
+        Product_category = Category.objects.get(pk=int(request.POST["categories"]))
         newProduct = Product.objects.create(
             name = Product_name,
             price = Product_price,
             description = Product_description,
             image = Product_image,
-            close = False
+            close = False,
+            category = Product_category,
+            created_by = request.user
         )
         return HttpResponseRedirect(reverse("auctions:listings", args=(newProduct.id,)))
-    return render(request, "auctions/create.html")    
+    return render(request, "auctions/create.html", {
+        "CategoryList": CategoryList
+    })    
 
 
 def listings(request, product_id):
@@ -87,6 +98,7 @@ def listings(request, product_id):
     BidList = listings.product_bids.values_list("bid", flat=True)
     BidderList = list(listings.product_bids.values_list("user_id", flat=True))
     CommentList = listings.product_comment.all()
+    CategoryList = Category.objects.all().values_list('name', flat=True)
     
     # Check if user is signed in or not, if not, the watchlist feature won't be showed
     if request.user.is_authenticated:
@@ -114,7 +126,8 @@ def listings(request, product_id):
             'maxBidPrice': format(maxBidPrice,".2f"),
             'winner': winner,
             'commentList': CommentList,
-            "Watchlist": watchlist
+            "Watchlist": watchlist,
+            "CategoryList": CategoryList
             })
     else:
         raise Http404('Product does not exist')
@@ -124,12 +137,18 @@ def bidding(request, product_id):
     if request.method == "POST":
         listings = Product.objects.get(pk=product_id)
         newInput = float(request.POST['bidding'])
+        
+        # Check if the user input is valid (must be greater than the starting bid), then create a BidPriceList which contains all of the Bid history
         if newInput > listings.price:
             BidPriceList = listings.product_bids.values_list("bid", flat=True)
+            
+            # Check if the BidPriceList is empty, then the maxBidPrice is the starting bid, if not, the maxBidPrice is the max value in the BidPriceList
             if not BidPriceList:
                 maxBidPrice = listings.price
             else:
                 maxBidPrice = float(max(BidPriceList))
+                
+            # Check if the user input is valid (must be greater than the maxBid)
             if newInput > maxBidPrice:
                 newBid = Bid.objects.create(
                     product = Product.objects.get(pk=product_id),
@@ -177,4 +196,18 @@ def watchlist(request, product_id):
 def showWatchList(request):
     return render (request, "auctions/watchlist.html", {
         "Watchlist": request.user.watchlist.all()
+    })
+
+def showCategories(request):
+    CategoryList = Category.objects.all()
+    return render(request, "auctions/categories.html", {
+        'CategoryList': CategoryList
+    })
+    
+def Categories(request, categories_id):
+    category = Category.objects.get(pk = categories_id)
+    category_listing = category.categories.all()
+    return render(request, "auctions/category.html", {
+        'category_listing': category_listing,
+        'category': category
     })
