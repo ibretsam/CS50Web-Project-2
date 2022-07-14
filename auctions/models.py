@@ -1,6 +1,3 @@
-from tkinter import CASCADE
-from turtle import ondrag
-from unicodedata import category, decimal
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
